@@ -1,10 +1,4 @@
-// process.env.UV_THREADPOOL_SIZE = 1;
-const cluster = require("cluster");
-
-if (cluster.isMaster) {
-  cluster.fork();
-} else {
-  const crypto = require("crypto");
+const crypto = require("crypto");
   const express = require("express");
   const app = express();
 
@@ -19,4 +13,3 @@ if (cluster.isMaster) {
   });
 
   app.listen(3000);
-}
