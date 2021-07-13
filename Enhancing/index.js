@@ -1,15 +1,30 @@
-const express = require("express");
-const app = express();
+const cluster = require("cluster");
+// console.log(cluster.isMaster);
+//will tell all your sever related code in the else block
 
-//blocking the event loop
-function doWork(duration) {
+//Is the file being executed in master mode?
+
+if (cluster.isMaster) {
+  //if this returns true
+  //Cause index.js to be executed *again* but
+  //in child mode
+  cluster.fork(); //everytime we call fork(), isMaster will be set to false hence we enter the else block
+} else {
+  //Im a child, Im going to act like a server
+  // and do nothing else
+  const express = require("express");
+  const app = express();
+
+  //blocking the event loop
+  function doWork(duration) {
     const start = Date.now();
-    while(Date.now() - start < duration){}
-}
+    while (Date.now() - start < duration) {}
+  }
 
-app.get("/", (req, res, next) => {
+  app.get("/", (req, res, next) => {
     doWork(5000);
     res.send("Hi there");
-})
+  });
 
-app.listen(3000);
+  app.listen(3000);
+}
