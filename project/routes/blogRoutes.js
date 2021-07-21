@@ -25,17 +25,21 @@ module.exports = (app) => {
     //Do we have any chached data in redis related 
     // to this query
     const cachedBlogs = await client.get(req.user.id);
-    console.log(cachedBlogs);
 
     //if yes, then respond to the request riht away
     //and return
-
+    if (cachedBlogs) {
+      console.log("Serving from cache");
+      return res.send(JSON.parse(cachedBlogs));
+    }
     //if no, we need to respond to request
     //update our cache to store data 
-
     const blogs = await Blog.find({ _user: req.user.id });
-
+    console.log("Severing from MongoDB");
     res.send(blogs);
+    //update our cache
+    client.set(req.user.id, JSON.stringify(blogs));
+
   });
 
   app.post("/api/blogs", requireLogin, async (req, res) => {
