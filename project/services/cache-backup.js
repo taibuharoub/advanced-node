@@ -6,23 +6,7 @@ const redisUrl = "redis://127.0.0.1:6379";
 const client = redis.createClient(redisUrl);
 client.get = util.promisify(client.get);
 const exec = mongoose.Query.prototype.exec;
-
-//will below function to the prototype object
-//so that its available to any query we create
-//inside of our application
-//use normal function
-mongoose.Query.prototype.cache = function() {
-  this.useCache = true;
-  //to make sure its chainable function call return this
-  return this;
-}
 mongoose.Query.prototype.exec = async function () {
-  //since they exist on the same query instance 
-  //we can reference useCache insode this function
-  if (!this.useCache) {
-    return exec.apply(this, arguments);
-  }
-
   /* console.log("I'm about to run a Query");
 
     // this will be refernce to the current querry we 
@@ -71,8 +55,7 @@ mongoose.Query.prototype.exec = async function () {
 
     // return doc;
     // return cacheValue;
-    
-    console.log("From redis cache");
+
     const doc = JSON.parse(cacheValue);
     // Array.isArray(doc) ? its an array : its an object 
     return Array.isArray(doc)
