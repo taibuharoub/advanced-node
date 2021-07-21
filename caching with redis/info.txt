@@ -1,0 +1,19 @@
+ npm install ioredis
+
+  const Redis = require("ioredis");
+ const redis = new Redis(6379, "localhost");
+
+ redis.set("mykey", "Hello from io-redis!");
+ redis.get("mykey", function(err, result){
+     if (err) { throw err; }
+ 
+     console.log(result);
+ });
+
+ // use the promise instead of callback
+ redis.get("mykey").then(function (result) {
+     console.log(result);
+ });
+
+ redis.zadd("vehicles", 0, "car", 0, "bike");
+ redis.zrange("vehicles", 0, -1, "WITHSCORES").then((res) => console.log(res));
