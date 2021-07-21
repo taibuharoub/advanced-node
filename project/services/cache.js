@@ -16,6 +16,8 @@ mongoose.Query.prototype.exec = async function () {
     
     //Object.assign() is used to copy properties from one
     //object to another */
+    // this inside of this function is a refernce to the Query 
+    // we are tring to execute 
 
     const key = JSON.stringify(Object.assign({}, this.getQuery(), {
         collection: this.mongooseCollection.name
@@ -25,12 +27,28 @@ mongoose.Query.prototype.exec = async function () {
     const cacheValue = await client.get(key)
 
     //if we do, return that
-    if (cacheValue) {
+    /* if (cacheValue) {
         console.log(cacheValue);
         //anything from redis will be in json format
         //so we need to parse it before we return it 
 
         return JSON.parse(cacheValue);
+        // return cacheValue;
+    } */
+    if (cacheValue) {
+        // this.model is a reference to the modal that 
+        // reperents this query 
+        //this.model is the same as referencing Blog
+       const doc = new this.model(JSON.parse(cacheValue));
+
+        // same as saying
+        /* new Blog({
+            title: "hi",
+            content: "there"
+        }) */
+
+        return doc;
+        // return cacheValue;
     }
 
     //otherwise, issue the query and store the result in redis
