@@ -87,6 +87,8 @@ mongoose.Query.prototype.exec = async function () {
 
   //make sure to turn result to json before storing it
   // inside redis
-  client.set(key, JSON.stringify(result));
+  // client.set(key, JSON.stringify(result));
+  //automatic expiration
+  client.set(key, JSON.stringify(result), "EX", 10);
   return result;
 };
