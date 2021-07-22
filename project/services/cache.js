@@ -95,3 +95,14 @@ mongoose.Query.prototype.exec = async function () {
   client.hset(this.hashkey, key, JSON.stringify(result), "EX", 10);
   return result;
 };
+
+//function to delete data nested on a particular key
+module.exports = {
+  clearHash(hashkey) {
+    //to delete all information call
+    //note the hashkey may accidently be provided as 
+    // array or object so to avoid any type of error 
+    //we will stringify the haskey first
+    client.del(JSON.stringify(hashkey));
+  }
+};
