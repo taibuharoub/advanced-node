@@ -4,18 +4,15 @@ const util = require("util");
 
 const redisUrl = "redis://127.0.0.1:6379";
 const client = redis.createClient(redisUrl);
-client.hget = util.promisify(client.hget);
+client.get = util.promisify(client.get);
 const exec = mongoose.Query.prototype.exec;
 
 //will below function to the prototype object
 //so that its available to any query we create
 //inside of our application
 //use normal function
-// where options is  a top level hash key to use
-mongoose.Query.prototype.cache = function(options = {}) {
+mongoose.Query.prototype.cache = function() {
   this.useCache = true;
-  //incase someone doesnot pass in a key use an empty string
-  this.hashkey = JSON.stringify(options.key || "");
   //to make sure its chainable function call return this
   return this;
 }
@@ -36,7 +33,7 @@ mongoose.Query.prototype.exec = async function () {
     //Object.assign() is used to copy properties from one
     //object to another */
   // this inside of this function is a refernce to the Query
-  // we are tring to execute 
+  // we are tring to execute
 
   const key = JSON.stringify(
     Object.assign({}, this.getQuery(), {
@@ -45,7 +42,7 @@ mongoose.Query.prototype.exec = async function () {
   );
 
   //see if we have a value for "key" in redis
-  const cacheValue = await client.hget(this.hashkey, key);
+  const cacheValue = await client.get(key);
 
   //if we do, return that
   /* if (cacheValue) {
@@ -92,6 +89,6 @@ mongoose.Query.prototype.exec = async function () {
   // inside redis
   // client.set(key, JSON.stringify(result));
   //automatic expiration
-  client.hset(this.hashkey, key, JSON.stringify(result), "EX", 10);
+  client.set(key, JSON.stringify(result), "EX", 10);
   return result;
 };

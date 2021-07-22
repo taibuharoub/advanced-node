@@ -14,8 +14,9 @@ module.exports = (app) => {
   });
 
   app.get("/api/blogs", requireLogin, async (req, res) => {
-
-    const blogs = await Blog.find({ _user: req.user.id }).cache();
+    const blogs = await Blog.find({ _user: req.user.id }).cache({
+      key: req.user.id,
+    });
 
     res.send(blogs);
 
@@ -44,7 +45,6 @@ module.exports = (app) => {
     res.send(blogs);
     //update our cache
     client.set(req.user.id, JSON.stringify(blogs)); */
-
   });
 
   app.post("/api/blogs", requireLogin, async (req, res) => {
