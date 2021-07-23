@@ -14,3 +14,7 @@ cache:
 install:
  - npm install
  - npm run build //project specific
+script: 
+ - nohup npm run start &
+ - sleep 3 //give ur server to some time to fully start
+ - npm run test
